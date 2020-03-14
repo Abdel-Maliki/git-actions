@@ -1,14 +1,17 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: CI demo deploy
 
 # Controls when the action will run. Triggers the workflow on push or pull request 
 # events but only for the master branch
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
+env:
+  GITHUB_DOCKER_REGISTRY: docker.pkg.github.com
+  ORGANISATION: loga-engineering
+  PROJECT: demo-cloud
+  PACKAGE_NAME: dc-server
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -22,9 +25,36 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
+    - name: install maven
+      run: sudo apt install maven
+
+    - name: clean and create package
+      run: sudo mvn clean package
+
+    - name: install docker
+      run: |
+        sudo apt install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        sudo apt update
+        sudo apt install docker-ce
+        sudo apt-mark hold docker-ce
+        sudo systemctl status docker
+        sudo usermod -aG docker $USER
     # Runs a single command using the runners shell
+    - name: Docker build
+      run: |
+        docker build -t docker.pkg.github.com/Abdel-Maliki/git-actions/deploy .
+    - name: Docker login
+      run: |
+        docker login docker.pkg.github.com -u ${{ secrets.USERNAME }} -p ${{ secrets.GITHUB_TOKEN }}
+    - name: Docker push
+      run: |
+        docker push docker.pkg.github.com/Abdel-Maliki/actions/deploy
+
     - name: Run a one-line script
       run: echo Hello, world!
+
 
     # Runs a set of commands using the runners shell
     - name: Run a multi-line script
