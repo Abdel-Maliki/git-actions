@@ -9,6 +9,6 @@ VOLUME /tmp
 
 EXPOSE 8080
 
-COPY *.jar app.jar
+COPY git_actions-0.0.1-SNAPSHOT.jar app.jar
 
 CMD ["java","-jar","/app.jar"]
