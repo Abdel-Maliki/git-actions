@@ -50,7 +50,7 @@ jobs:
         docker login docker.pkg.github.com -u abdel-maliki -p ${{ secrets.GITHUB_TOKEN }}
     - name: Docker push
       run: |
-        docker push docker.pkg.github.com/Abdel-Maliki/actions/deploy
+        docker push docker.pkg.github.com/abdel-maliki/actions/deploy
 
     - name: Run a one-line script
       run: echo Hello, world!
